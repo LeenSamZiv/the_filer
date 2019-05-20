@@ -11,13 +11,15 @@
 
 ## 使用步骤
 
-> 命令行执行 `filer`
+> 执行 `mvn clean package` 以编译程序
+
+> 执行 `filer` 以启动程序
 
 > 客户终端访问 `[ip:8080]`
 
 > 选择＆上传文件
 
-> 服务端从 `[D:/_the_filer_upload/]`取得文件
+> 服务端从 `D:/_the_filer_upload/` 取得文件
 
 ##配置
 
