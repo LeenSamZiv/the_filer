@@ -2,12 +2,17 @@
 
 ![](PREVIEW.gif)
 
-## 环境
-> JAVA `[1.8.0_201]`
-
 ## 简介
 
 > 局域网文件上传
+
+> 服务端从 `D:/_the_filer_upload/` 取得文件
+
+## 运行&编译环境
+
+> Java `1.8.0_201`
+
+> Maven `3.6.1`
 
 ## 使用步骤
 
@@ -15,12 +20,8 @@
 
 > 执行 `filer` 以启动程序
 
-> 客户终端访问 `[ip:8080]`
+> 终端访问 `[ip:8080]` 以选择＆上传文件
 
-> 选择＆上传文件
+## 配置
 
-> 服务端从 `D:/_the_filer_upload/` 取得文件
-
-##配置
-
-> `[src\main\resources\application.properties]`->`[file.path]` : 文件保存路径 
+> 文件保存路径 `src\main\resources\application.properties -> file.path`
