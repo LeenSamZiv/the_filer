@@ -2,7 +2,7 @@
     <div class="list">
         <loading-bar :loading="dataLoading"></loading-bar>
         <div class="empty" v-if="dataArray.length<1 && !dataLoading">EMPTY</div>
-        <div class="item" v-for="item of dataArray">
+        <div class="item" v-for="item of dataArray" :key="item.name">
             <div class="name">{{item.name}}</div>
             <div class="sizeString">{{item.sizeString}}</div>
         </div>
