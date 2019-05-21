@@ -1,7 +1,3 @@
-HELP.md
-/target/
-!.mvn/wrapper/maven-wrapper.jar
-
 ### STS ###
 .apt_generated
 .classpath
@@ -27,3 +23,20 @@ HELP.md
 
 ### VS Code ###
 .vscode/
+
+### server ###
+server/target/
+server/src/main/resources/static/
+!server/.mvn/wrapper/maven-wrapper.jar
+
+### web ###
+web/.DS_Store
+web/node_modules
+web/dist
+# local env files
+web/.env.local
+web/.env.*.local
+# Log files
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*

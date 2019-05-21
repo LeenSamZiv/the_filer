@@ -1,5 +1,6 @@
 package leensamziv.filer;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,19 +9,28 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "api/")
 public class MainController {
+    private String path = ResourceBundle.getBundle("application").getString("file.path");
+
+    @GetMapping(value = "list")
+    public FileBean[] list() {
+        File file = new File(path);
+        File[] files = file.listFiles();
+        if (files != null) {
+            return Arrays.stream(files).map(item -> new FileBean(item.getName(), item.length())).toArray(FileBean[]::new);
+        } else {
+            return new FileBean[]{};
+        }
+    }
+
     @PostMapping(value = "upload")
     public String upload(MultipartHttpServletRequest request) throws IOException {
         //Powered By https://blog.csdn.net/wanghailong_qd/article/details/72778264
         Iterator<String> fileNames = request.getFileNames();
-        String path = ResourceBundle.getBundle("application").getString("file.path");
         while (fileNames.hasNext()) {
             String fileName = fileNames.next();
             List<MultipartFile> fileList = request.getFiles(fileName);

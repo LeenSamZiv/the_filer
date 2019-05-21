@@ -6,4 +6,4 @@ chcp 65001
 
 echo 请访问 %IP%:8080 以上传文件
 start D:\_the_filer_upload
-java -jar target\the_filer-1.1.jar
+java -jar server\target\the_filer-1.1.jar
