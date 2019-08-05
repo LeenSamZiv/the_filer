@@ -83,4 +83,21 @@ export default class {
             }
         );
     }
+
+    static DeleteData(data) {
+        let xhr = this.CreateRequest("delete", "api/remove", true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(data);
+        return new Promise(
+            (resolve, reject) => {
+                xhr.onload = () => {
+                    if (xhr.status === 200 && xhr.response) {
+                        resolve(xhr.response);
+                    } else {
+                        reject("删除失败");
+                    }
+                };
+            }
+        );
+    }
 }

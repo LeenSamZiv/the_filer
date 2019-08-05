@@ -84,6 +84,12 @@ public class MainController {
         }
     }
 
+    @DeleteMapping(value = "remove")
+    public Boolean remove(@RequestBody FileBean bean) {
+        File file = findFile(bean);
+        return file != null && file.delete();
+    }
+
     private File findFile(FileBean bean) {
         bean.name = bean.name.replaceAll("\\\\", "").replaceAll("/", "");
         File[] files = new File(path).listFiles();

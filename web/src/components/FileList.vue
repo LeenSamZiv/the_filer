@@ -8,11 +8,10 @@
                 <div class="lastModified">
                     {{item.lastModified | dateFormat}}
                 </div>
-                <div class="sizeString copy-unable"
-                     title="download"
-                     @click="handleDownload(item)">
-                    {{item.sizeString}}
-                    <span>⏬</span>
+                <div class="function copy-unable">
+                    <div class="sizeString"> {{item.sizeString}}</div>
+                    <div class="download" title="download" @click="handleDownload(item)">⏬</div>
+                    <div class="delete" title="delete" @click="handleDelete(item)">🚮</div>
                 </div>
             </div>
         </div>
@@ -50,6 +49,7 @@
             },
 
             getData() {
+                this.controlLoading(true);
                 let renderData = array => {
                     array.forEach(item => item.sizeString = this.stringUtil.formatSize(item.size));
                     this.dataArray = array;
@@ -70,6 +70,21 @@
 
                 DataInterfaceUtil.GetData(JSON.stringify(requestData)).then(
                     response => this.saveFile(response)
+                ).catch(
+                    val => console.log(val)
+                );
+            },
+
+            handleDelete(target) {
+                let requestData = {
+                    name: target.name, size: target.size, lastModified: target.lastModified,
+                };
+                if (!window.confirm(`是否删除${requestData.name}？`)) {
+                    return null;
+                }
+
+                DataInterfaceUtil.DeleteData(JSON.stringify(requestData)).then(
+                    () => this.getData()
                 ).catch(
                     val => console.log(val)
                 );
@@ -164,16 +179,25 @@
             }
 
             > .info {
-                > .sizeString {
-                    text-align: right;
-                    transition: all 0.2s;
+                > .function {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
 
-                    &:hover {
-                        transform: scale(1.1);
+                    > div {
+                        margin-left: 0.5em;
                     }
 
-                    &:active {
-                        transform: scale(1.05);
+                    > .download, > .delete {
+                        transition: all 0.2s;
+
+                        &:hover {
+                            transform: scale(1.1);
+                        }
+
+                        &:active {
+                            transform: scale(1.05);
+                        }
                     }
                 }
             }
