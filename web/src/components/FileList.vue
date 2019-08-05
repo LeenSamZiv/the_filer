@@ -4,7 +4,10 @@
         <div class="empty" v-if="dataArray.length<1 && !dataLoading">EMPTY</div>
         <div class="item" v-for="item of dataArray" :key="item.name">
             <div class="name">{{item.name}}</div>
-            <div class="sizeString">{{item.sizeString}}</div>
+            <div class="info">
+                <div class="lastModified">{{item.lastModified | dateFormat}}</div>
+                <div class="sizeString">{{item.sizeString}}</div>
+            </div>
         </div>
     </div>
 </template>
@@ -12,10 +15,17 @@
 <script>
     import StringUtil from "../utils/StringUtil";
     import LoadingBar from "./LoadingBar";
+    import DateUtil from "../utils/DateUtil";
+    import DataInterfaceUtil from "../utils/DataInterfaceUtil";
 
     export default {
         name: "FileList",
         components: {LoadingBar},
+        filters: {
+            dateFormat(value) {
+                return DateUtil.format(value)
+            }
+        },
         data() {
             return {
                 stringUtil: new StringUtil(),
@@ -32,23 +42,11 @@
             },
 
             getData() {
-                let xhr = new XMLHttpRequest();
-                xhr.open('get', 'api/list', true);
-                xhr.send();
-                xhr.onload = () => {
-                    switch (xhr.status) {
-                        case 200:
-                            this.renderData(JSON.parse(xhr.response));
-                            break;
-                        case  500:
-                            if (xhr.response.indexOf('Maximum upload size exceeded')) {
-                                alert('文件过大');
-                            } else {
-                                alert('服务器出错');
-                            }
-                            break;
-                    }
-                };
+                DataInterfaceUtil.GetList().then(
+                    value => this.renderData(value)
+                ).catch(
+                    error => alert(error)
+                );
             },
 
             renderData(array) {
@@ -105,6 +103,12 @@
 
             > .name {
                 flex: 1;
+                word-break: break-all;
+                margin-right: 0.2em;
+            }
+
+            > .info > .sizeString {
+                text-align: right;
             }
         }
     }

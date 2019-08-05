@@ -5,6 +5,8 @@
 </template>
 
 <script>
+    import DataInterfaceUtil from "../utils/DataInterfaceUtil";
+
     export default {
         name: "FileUploader",
         methods: {
@@ -15,29 +17,14 @@
                 if (event.target.files.length > 0) {
                     this.$emit('uploadStart');
                     let formData = new FormData(document.getElementById("formFile"));
-                    let xhr = new XMLHttpRequest();
-                    xhr.open("post", "api/upload");
-                    xhr.send(formData);
-                    xhr.onload = () => {
-                        this.$emit('uploadDone');
-                        switch (xhr.status) {
-                            case 200:
-                                break;
-                            case  500:
-                                if (xhr.response.indexOf('Maximum upload size exceeded')) {
-                                    alert('文件过大');
-                                } else {
-                                    alert('服务器出错');
-                                }
-                                break;
-                        }
-                    }
+
+                    DataInterfaceUtil.PostData(formData).then(
+                        () => this.$emit('uploadDone')
+                    ).catch(
+                        error => this.$emit('uploadDone') && alert(error)
+                    );
                 }
             }
         }
     }
 </script>
-
-<style scoped>
-
-</style>

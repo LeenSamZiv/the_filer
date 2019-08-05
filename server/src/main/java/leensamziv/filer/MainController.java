@@ -21,7 +21,9 @@ public class MainController {
         File file = new File(path);
         File[] files = file.listFiles();
         if (files != null) {
-            return Arrays.stream(files).map(item -> new FileBean(item.getName(), item.length())).toArray(FileBean[]::new);
+            return Arrays.stream(files).map(
+                    item -> new FileBean(item.getName(), item.lastModified(), item.length())
+            ).toArray(FileBean[]::new);
         } else {
             return new FileBean[]{};
         }
@@ -47,10 +49,8 @@ public class MainController {
                     if (!(dest.exists())) {
                         multipartFile.transferTo(dest);
                     }
-                    System.out.println("---------------------------------------------------");
+                    System.out.println("-----" + new Date().toString() + "-----");
                     System.out.println(path + originalFilename);
-                    System.out.println(new Date().toString());
-                    System.out.println("---------------------------------------------------");
                 }
             }
         }

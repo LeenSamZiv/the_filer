@@ -12,4 +12,7 @@ module.exports = {
         modules: false
     },
     productionSourceMap: process.env.NODE_ENV === "development",
+    devServer: {
+        port: 9090,
+    },
 };
