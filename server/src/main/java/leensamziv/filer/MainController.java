@@ -1,14 +1,16 @@
 package leensamziv.filer;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 @RestController
@@ -18,8 +20,7 @@ public class MainController {
 
     @GetMapping(value = "list")
     public FileBean[] list() {
-        File file = new File(path);
-        File[] files = file.listFiles();
+        File[] files = new File(path).listFiles();
         if (files != null) {
             return Arrays.stream(files).map(
                     item -> new FileBean(item.getName(), item.lastModified(), item.length())
@@ -55,5 +56,39 @@ public class MainController {
             }
         }
         return "😊 received";
+    }
+
+    @PostMapping(value = "download")
+    public void download(@RequestBody FileBean bean, HttpServletResponse response) throws UnsupportedEncodingException {
+        File[] files = new File(path).listFiles();
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                if (
+                        bean.lastModified == file.lastModified()
+                                && bean.size == file.length()
+                                && bean.name.equals(file.getName())
+                ) {
+                    //Powered By https://blog.csdn.net/eieiei438/article/details/83824375
+                    String contentDisposition = "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8");
+                    response.setHeader("Content-Disposition", contentDisposition);
+                    response.setContentType("application/octet-stream");
+                    try {
+                        FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                        byte[] content = new byte[fis.available()];
+                        fis.read(content);
+                        fis.close();
+
+                        ServletOutputStream sos = response.getOutputStream();
+                        sos.write(content);
+
+                        sos.flush();
+                        sos.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

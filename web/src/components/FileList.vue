@@ -5,8 +5,15 @@
         <div class="item" v-for="item of dataArray" :key="item.name">
             <div class="name">{{item.name}}</div>
             <div class="info">
-                <div class="lastModified">{{item.lastModified | dateFormat}}</div>
-                <div class="sizeString">{{item.sizeString}}</div>
+                <div class="lastModified">
+                    {{item.lastModified | dateFormat}}
+                </div>
+                <div class="sizeString copy-unable"
+                     title="download"
+                     @click="handleDownload(item)">
+                    {{item.sizeString}}
+                    <span>⏬</span>
+                </div>
             </div>
         </div>
     </div>
@@ -17,6 +24,7 @@
     import LoadingBar from "./LoadingBar";
     import DateUtil from "../utils/DateUtil";
     import DataInterfaceUtil from "../utils/DataInterfaceUtil";
+    import CommonUtil from "../utils/CommonUtil";
 
     export default {
         name: "FileList",
@@ -42,17 +50,65 @@
             },
 
             getData() {
+                let renderData = array => {
+                    array.forEach(item => item.sizeString = this.stringUtil.formatSize(item.size));
+                    this.dataArray = array;
+                    this.controlLoading(false);
+                };
+
                 DataInterfaceUtil.GetList().then(
-                    value => this.renderData(value)
+                    value => renderData(value)
                 ).catch(
                     error => alert(error)
                 );
             },
 
-            renderData(array) {
-                array.forEach(item => item.sizeString = this.stringUtil.formatSize(item.size));
-                this.dataArray = array;
-                this.controlLoading(false);
+            handleDownload(target) {
+                let requestData = {
+                    name: target.name, size: target.size, lastModified: target.lastModified,
+                };
+
+                DataInterfaceUtil.GetData(JSON.stringify(requestData)).then(
+                    response => this.saveFile(response)
+                ).catch(
+                    val => console.log(val)
+                );
+            },
+
+            saveFile(response) {
+                let fileName = decodeURIComponent(response.disposition).substring(20);
+
+                let handleChromium = () => {
+                    let aTag = document.createElement('a');
+                    let blob = new Blob([response.data]);
+                    aTag.href = URL.createObjectURL(blob);
+                    aTag.download = fileName;
+                    aTag.click();
+                    URL.revokeObjectURL(blob);
+                };
+
+                let handleFireFox = () => {
+                    let file = new File([response.data], fileName);
+                    parent.location.href = URL.createObjectURL(file);
+                };
+
+                let handleIE = () => {
+                    let file = new Blob([response.data]);
+                    window.navigator.msSaveBlob(file, fileName);
+                };
+
+                switch (CommonUtil.getBrowser()) {
+                    case 'Firefox':
+                        handleFireFox();
+                        break;
+                    case 'IE':
+                        handleIE();
+                        break;
+                    case 'Chrome':
+                    default:
+                        handleChromium();
+                        break;
+                }
             }
         }
     }
@@ -107,8 +163,19 @@
                 margin-right: 0.2em;
             }
 
-            > .info > .sizeString {
-                text-align: right;
+            > .info {
+                > .sizeString {
+                    text-align: right;
+                    transition: all 0.2s;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
+
+                    &:active {
+                        transform: scale(1.05);
+                    }
+                }
             }
         }
     }

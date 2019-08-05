@@ -5,6 +5,9 @@ public class FileBean {
     long lastModified;
     long size;
 
+    public FileBean() {
+    }
+
     public FileBean(String name, long lastModified, long size) {
         this.name = name;
         this.lastModified = lastModified;

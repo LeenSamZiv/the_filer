@@ -1,9 +1,16 @@
 export default class {
-    static GetList() {
+    static CreateRequest(method, url, async) {
         let xhr = new XMLHttpRequest();
-        xhr.open('get', 'api/list', true);
-        xhr.send();
+        xhr.open(method, url, async);
+        return xhr;
+    }
 
+    /**
+     * 获取列表
+     */
+    static GetList() {
+        let xhr = this.CreateRequest('get', 'api/list', true);
+        xhr.send();
         return new Promise(
             (resolve, reject) => {
                 xhr.onload = () => {
@@ -24,9 +31,12 @@ export default class {
         );
     }
 
+    /**
+     * 上传文件
+     * @param formData
+     */
     static PostData(formData) {
-        let xhr = new XMLHttpRequest();
-        xhr.open("post", "api/upload");
+        let xhr = this.CreateRequest("post", "api/upload", true);
         xhr.send(formData);
         return new Promise(
             (resolve, reject) => {
@@ -45,6 +55,29 @@ export default class {
                         default:
                             resolve();
                             break;
+                    }
+                }
+            }
+        );
+    }
+
+    /**
+     * 下载文件
+     * @param data
+     */
+    static GetData(data) {
+        let xhr = this.CreateRequest("post", "api/download", true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.responseType = "blob";
+        xhr.send(data);
+        return new Promise(
+            (resolve, reject) => {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        resolve({
+                            disposition: xhr.getResponseHeader("Content-disposition"),
+                            data: xhr.response
+                        });
                     }
                 }
             }
