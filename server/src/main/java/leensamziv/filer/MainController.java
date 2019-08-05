@@ -60,35 +60,43 @@ public class MainController {
 
     @PostMapping(value = "download")
     public void download(@RequestBody FileBean bean, HttpServletResponse response) throws UnsupportedEncodingException {
+        File file = findFile(bean);
+        if (file == null) {
+            return;
+        }
+        //Powered By https://blog.csdn.net/eieiei438/article/details/83824375
+        String contentDisposition = "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8");
+        response.setHeader("Content-Disposition", contentDisposition);
+        response.setContentType("application/octet-stream");
+        try {
+            FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+            byte[] content = new byte[fis.available()];
+            fis.read(content);
+            fis.close();
+
+            ServletOutputStream sos = response.getOutputStream();
+            sos.write(content);
+
+            sos.flush();
+            sos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private File findFile(FileBean bean) {
+        bean.name = bean.name.replaceAll("\\\\", "").replaceAll("/", "");
         File[] files = new File(path).listFiles();
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
                 if (
-                        bean.lastModified == file.lastModified()
-                                && bean.size == file.length()
-                                && bean.name.equals(file.getName())
+                        bean.lastModified == file.lastModified() && bean.size == file.length() && bean.name.equals(file.getName())
                 ) {
-                    //Powered By https://blog.csdn.net/eieiei438/article/details/83824375
-                    String contentDisposition = "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8");
-                    response.setHeader("Content-Disposition", contentDisposition);
-                    response.setContentType("application/octet-stream");
-                    try {
-                        FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                        byte[] content = new byte[fis.available()];
-                        fis.read(content);
-                        fis.close();
-
-                        ServletOutputStream sos = response.getOutputStream();
-                        sos.write(content);
-
-                        sos.flush();
-                        sos.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    return file;
                 }
             }
         }
+        return null;
     }
 }
