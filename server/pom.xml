@@ -10,9 +10,9 @@
     </parent>
     <groupId>leensamziv</groupId>
     <artifactId>the_filer</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <name>the_filer</name>
-    <description>Demo project for Spring Boot</description>
+    <description>the_filer</description>
 
     <properties>
         <java.version>1.8</java.version>
